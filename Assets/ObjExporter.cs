@@ -27,52 +27,22 @@ public class ObjExporter
     public static string MeshToString(Mesh m)
     {
         BoneWeight1[] boneWeights = m.GetAllBoneWeights().ToArray();
-        List<Edge> edges = new List<Edge>();
+        Debug.Log(boneWeights.Length);
 
         StringBuilder sb = new StringBuilder();
 
-        foreach(Vector3 v in m.vertices)
+        for(int i=0; i < m.vertexCount; i++)
         {
+            Vector3 v = m.vertices[i];
             sb.Append(string.Format("v {0} {1} {2}\n", v.x, v.y, v.z));
         }
         for (int i=0; i < m.triangles.Length; i+=3)
         {
             sb.Append(string.Format("f {0} {1} {2}\n",
-                    m.triangles[i], m.triangles[i+1], m.triangles[i+2]));
-            BoneWeight1[] weights = 
-            {
-                boneWeights[m.triangles[i]],
-                boneWeights[m.triangles[i+1]],
-                boneWeights[m.triangles[i+2]]
-            };
-            for (int j=0; j<3; j++)
-            {
-                int bi;
-                if (weights[j].boneIndex == weights[(j+1)%3].boneIndex || 
-                        weights[j].weight >= weights[(j+1)%3].weight)
-                {
-                    bi = weights[j].boneIndex;
-                }
-                else
-                {
-                    bi = weights[(j+1)%3].boneIndex;
-                }
-                Edge edge;
-                edge.v1 = m.triangles[i+j] < m.triangles[i+(j+1)%3] ? m.triangles[i+j] : m.triangles[i+(j+1)%3];
-                edge.v2 = m.triangles[i+j] >= m.triangles[i+(j+1)%3] ? m.triangles[i+j] : m.triangles[i+(j+1)%3];
-                edge.boneIndex = bi;
-                edges.Add(edge);
-            }
-            
+                    m.triangles[i]+1, m.triangles[i+1]+1, m.triangles[i+2]+1));
         }
-
-        edges = edges.Distinct().ToList();
-
-        /*foreach (Edge e in edges)
-        {
-            sb.Append(string.Format("e {0} {1} {2}\n", e.v1, e.v2, e.boneIndex));
-        }*/
-        return edges.ToString();
+        
+        return sb.ToString();
     }
 
     public static void MeshToFile(Mesh m, string filename) {
