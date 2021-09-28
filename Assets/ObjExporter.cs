@@ -5,23 +5,6 @@ using System.Text;
 using System.Linq;
 using UnityEngine;
 
-struct Edge{
-        public int v1;
-        public int v2;
-        public int boneIndex;
-};
-
-class ItemEqualityComparer:IEqualityComparer<Edge>
-{
-    public bool Equals(Edge x, Edge y)
-    {
-        return x.v1 == y.v1 && x.v2 == y.v2;
-    }
-    public int GetHashCode(Edge e)
-    {
-        return e.GetHashCode();
-    }
-}
 public class ObjExporter
 {
     public static string MeshToString(Mesh m)
@@ -46,13 +29,44 @@ public class ObjExporter
     }
 
     public static void MeshToFile(Mesh m, string filename) {
-        if (filename.Length < 4 || string.Compare(filename.Substring(filename.Length-4), ".obj") != 0)
+        if (filename.Length < 4 || string.Compare(filename.ToLower().Substring(filename.Length-4), ".obj") != 0)
         {
             filename += ".obj";
         }
         using (StreamWriter streamWriter = new StreamWriter(filename))
         {
             streamWriter.Write(MeshToString(m));
+        }
+    }
+
+    public static void BoneWeightsToFile(Transform[] bones, Mesh m, string filename)
+    {
+        if (filename.Length < 4 || string.Compare(filename.ToLower().Substring(filename.Length - 4), ".txt") != 0)
+        {
+            filename += ".txt";
+        }
+        using (StreamWriter streamWriter = new StreamWriter(filename))
+        {
+            StringBuilder sb = new StringBuilder();
+            BoneWeight[] boneWeights = m.boneWeights.ToArray();
+            sb.Append("# Bone Positions\n");
+            for (int i = 0; i < bones.Length; i++)
+            {
+                sb.Append(string.Format("{0} {1} {2}\n",
+                    bones[i].position.x, bones[i].position.y, bones[i].position.z));
+            }
+            sb.Append("\n");
+            sb.Append("# Bone Weights\n");
+            for (int i = 0; i < boneWeights.Length; i++)
+            {
+                BoneWeight b = boneWeights[i];
+                sb.Append(string.Format("{0} {1} {2} {3} ", 
+                    b.boneIndex0, b.boneIndex1, b.boneIndex2, b.boneIndex3));
+                sb.Append(string.Format("{0} {1} {2} {3}\n",
+                    b.weight0, b.weight1, b.weight2, b.weight3));
+            }
+
+            streamWriter.Write(sb.ToString());
         }
     }
 }

@@ -15,18 +15,23 @@ public class FbxLoader : MonoBehaviour
         {
             GameObject instantiated = (GameObject) Instantiate(fbxs[i]);
             // string datapath = Application.persistentDataPath + fbxs[i].name + ".obj";
-            string datapath = fbxs[i].name + ".obj";
+            string datapath = "Results/" + fbxs[i].name;
             SkinnedMeshRenderer[] renderers = fbxs[i].transform.GetComponentsInChildren<SkinnedMeshRenderer>();
             CombineInstance[] combine = new CombineInstance[renderers.Length];
+            List<Transform> bones = new List<Transform>();
             for (int j = 0; j < renderers.Length; j++)
             {
                 combine[j].mesh = renderers[j].sharedMesh;
                 combine[j].transform = renderers[j].transform.localToWorldMatrix;
+                bones.AddRange(renderers[j].bones);
             }
+
             transform.GetComponent<MeshFilter>().mesh = new Mesh();
             transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
+
             transform.gameObject.SetActive(true);
             ObjExporter.MeshToFile(transform.GetComponent<MeshFilter>().mesh, datapath);
+            ObjExporter.BoneWeightsToFile(bones.ToArray(), transform.GetComponent<MeshFilter>().mesh, datapath);
             Destroy(instantiated);
             
         }
