@@ -39,7 +39,25 @@ public class ObjExporter
         }
     }
 
-    public static void BoneWeightsToFile(Transform[] bones, Mesh m, string filename)
+    public static void BonesToFile(Transform[] bones, string filename)
+    {
+        if (filename.Length < 4 || string.Compare(filename.ToLower().Substring(filename.Length - 4), ".txt") != 0)
+        {
+            filename += ".txt";
+        }
+        using (StreamWriter streamWriter = new StreamWriter(filename))
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < bones.Length; i++)
+            {
+                sb.Append(string.Format("{0} {1} {2}\n",
+                    bones[i].position.x, bones[i].position.y, bones[i].position.z));
+            }
+
+            streamWriter.Write(sb.ToString());
+        }
+    }
+    public static void BoneWeightsToFile(Mesh m, string filename)
     {
         if (filename.Length < 4 || string.Compare(filename.ToLower().Substring(filename.Length - 4), ".txt") != 0)
         {
@@ -49,14 +67,6 @@ public class ObjExporter
         {
             StringBuilder sb = new StringBuilder();
             BoneWeight[] boneWeights = m.boneWeights.ToArray();
-            sb.Append("# Bone Positions\n");
-            for (int i = 0; i < bones.Length; i++)
-            {
-                sb.Append(string.Format("{0} {1} {2}\n",
-                    bones[i].position.x, bones[i].position.y, bones[i].position.z));
-            }
-            sb.Append("\n");
-            sb.Append("# Bone Weights\n");
             for (int i = 0; i < boneWeights.Length; i++)
             {
                 BoneWeight b = boneWeights[i];

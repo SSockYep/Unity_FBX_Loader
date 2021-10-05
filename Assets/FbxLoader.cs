@@ -31,7 +31,8 @@ public class FbxLoader : MonoBehaviour
 
             transform.gameObject.SetActive(true);
             ObjExporter.MeshToFile(transform.GetComponent<MeshFilter>().mesh, datapath);
-            ObjExporter.BoneWeightsToFile(bones.ToArray(), transform.GetComponent<MeshFilter>().mesh, datapath);
+            ObjExporter.BonesToFile(bones.ToArray(), datapath+"_Skeleton");
+            ObjExporter.BoneWeightsToFile(transform.GetComponent<MeshFilter>().mesh, datapath+"_Weight");
             Destroy(instantiated);
             
         }
