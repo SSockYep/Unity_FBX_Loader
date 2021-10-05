@@ -36,22 +36,18 @@ public class FbxLoader : MonoBehaviour
             transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
             Matrix4x4[] bindPoses = transform.GetComponent<MeshFilter>().mesh.bindposes;
             
-            // GameObjectÀÇ transformÀº ÀÐ±â Àü¿ë
-            // bones´Â TransformÀ¸·Î µÅÀÖ°í... ¾î¶»°Ô matrix Àû¿ëÇÏÁö?
+            // GameObjectï¿½ï¿½ transformï¿½ï¿½ ï¿½Ð±ï¿½ ï¿½ï¿½ï¿½ï¿½
+            // bonesï¿½ï¿½ Transformï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö°ï¿½... ï¿½î¶»ï¿½ï¿½ matrix ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?
 
             transform.gameObject.SetActive(true);
             Debug.Log(transform.GetComponent<MeshFilter>().mesh.bindposes.Length);
 
             Debug.Log(bones.Count);
             ObjExporter.MeshToFile(transform.GetComponent<MeshFilter>().mesh, datapath);
-<<<<<<< HEAD
             ObjExporter.BonesToFile(bones.ToArray(), datapath+"_Skeleton");
             ObjExporter.BoneWeightsToFile(transform.GetComponent<MeshFilter>().mesh, datapath+"_Weight");
             Destroy(instantiated);
             
-=======
-            ObjExporter.BoneWeightsToFile(bones.ToArray(), transform.GetComponent<MeshFilter>().mesh, datapath);
->>>>>>> 768c88e16a732957e7d22c1c53f2c43b79890baf
         }
 
     }
