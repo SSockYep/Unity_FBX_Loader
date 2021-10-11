@@ -24,10 +24,11 @@ public class FbxLoader : MonoBehaviour
             List<Transform> bones = new List<Transform>();
             for (int j = 0; j < renderers.Length; j++)
             {
-                // combine[j].mesh = renderers[j].sharedMesh;
-                Mesh tmp = new Mesh();
-                renderers[j].BakeMesh(tmp);
-                combine[j].mesh = tmp;
+                combine[j].mesh = renderers[j].sharedMesh;
+                /* Get Baked Mesh */
+                // Mesh tmp = new Mesh();
+                // renderers[j].BakeMesh(tmp);
+                // combine[j].mesh = tmp;
                 combine[j].transform = renderers[j].transform.localToWorldMatrix;
                 bones.AddRange(renderers[j].bones);
             }
@@ -35,9 +36,16 @@ public class FbxLoader : MonoBehaviour
             transform.GetComponent<MeshFilter>().mesh = new Mesh();
             transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
             Matrix4x4[] bindPoses = transform.GetComponent<MeshFilter>().mesh.bindposes;
-            
-            // GameObject�� transform�� �б� ����
-            // bones�� Transform���� ���ְ�... ��� matrix ��������?
+
+            // bindPoses[0] = bones[0].worldToLocalMatrix * transform.localToWorldMatrix;
+            // position = new Vector3(mat[0,3], mat[1,3], mat[2,3]);
+            // quaternion = Quaternion.LookRotation(new Vector3(mat[0,2], mat[1,2], mat[2,2]), new Vector3(mat[0,1], mat[1,1], mat[2,1]));
+            // scale = new Vector3(mat.GetColumn(0).magnitude, mat.GetColumn(1).magnitude, mat.GetColumn(2).magnitude);
+
+            for (int j = 0; j < bindPoses.Length; j++)
+            {
+                bones[j].position = new Vector3(bindPoses[j][0, 3], bindPoses[j][1, 3], bindPoses[j][2, 3]);
+            }
 
             transform.gameObject.SetActive(true);
             Debug.Log(transform.GetComponent<MeshFilter>().mesh.bindposes.Length);
