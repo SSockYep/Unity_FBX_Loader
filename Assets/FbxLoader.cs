@@ -48,7 +48,7 @@ public class FbxLoader : MonoBehaviour
             /* Getting bind pose position */
             for (int j = 0; j < bindPoses.Length; j++)
             {
-                Matrix4x4 mat = bones[j].localToWorldMatrix * bindPoses[j];
+                Matrix4x4 mat = bindPoses[j].inverse;
                 bones[j].position = new Vector3(mat[0, 3], mat[1, 3], mat[2, 3]);
             }
 
