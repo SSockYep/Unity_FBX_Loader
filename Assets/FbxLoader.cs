@@ -24,11 +24,14 @@ public class FbxLoader : MonoBehaviour
             List<Transform> bones = new List<Transform>();
             for (int j = 0; j < renderers.Length; j++)
             {
+                /* Get Shared Mesh (T-pose) */
                 combine[j].mesh = renderers[j].sharedMesh;
+
                 /* Get Baked Mesh */
                 // Mesh tmp = new Mesh();
                 // renderers[j].BakeMesh(tmp);
                 // combine[j].mesh = tmp;
+
                 combine[j].transform = renderers[j].transform.localToWorldMatrix;
                 bones.AddRange(renderers[j].bones);
             }
@@ -42,9 +45,11 @@ public class FbxLoader : MonoBehaviour
             // quaternion = Quaternion.LookRotation(new Vector3(mat[0,2], mat[1,2], mat[2,2]), new Vector3(mat[0,1], mat[1,1], mat[2,1]));
             // scale = new Vector3(mat.GetColumn(0).magnitude, mat.GetColumn(1).magnitude, mat.GetColumn(2).magnitude);
 
+            /* Getting bind pose position */
             for (int j = 0; j < bindPoses.Length; j++)
             {
-                bones[j].position = new Vector3(bindPoses[j][0, 3], bindPoses[j][1, 3], bindPoses[j][2, 3]);
+                Matrix4x4 mat = bones[j].localToWorldMatrix * bindPoses[j];
+                bones[j].position = new Vector3(mat[0, 3], mat[1, 3], mat[2, 3]);
             }
 
             transform.gameObject.SetActive(true);
