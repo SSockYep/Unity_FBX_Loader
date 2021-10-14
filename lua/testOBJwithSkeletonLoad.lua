@@ -21,7 +21,7 @@ function ctor()
 
 	local mesh
 	mesh=Geometry()
-	mesh:loadOBJ('/home/calab/Hamster.obj')
+	mesh:loadOBJ('/home/calab/Unity_FBX_Parser/Results/Hamster.obj')
 	
 
 	-- local m=matrix4()
@@ -57,7 +57,7 @@ function onFrameChanged(currFrame)
 end
 function onCallback(w, usrData)
 	if w:id()=='showBones' then
-		local f = io.open('/home/calab/Hamster_Skeleton.txt', "r")
+		local f = io.open('/home/calab/Unity_FBX_Parser/Results/Hamster_Skeleton.txt', "r")
 		local positions = {}
 		for line in f:lines("l") do
 			local l = {}
