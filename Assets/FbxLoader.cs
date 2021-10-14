@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(SkinnedMeshRenderer))]
 public class FbxLoader : MonoBehaviour
 {
@@ -17,9 +16,8 @@ public class FbxLoader : MonoBehaviour
             GameObject instantiated = (GameObject) Instantiate(fbxs[i]);
             meshes.Add(instantiated);
 
-            // string datapath = Application.persistentDataPath + fbxs[i].name + ".obj";
-            string datapath = "Results/" + fbxs[i].name;
-            SkinnedMeshRenderer[] renderers = fbxs[i].transform.GetComponentsInChildren<SkinnedMeshRenderer>();
+            string datapath = "Results/" + instantiated.name;
+            SkinnedMeshRenderer[] renderers = instantiated.transform.GetComponentsInChildren<SkinnedMeshRenderer>();
             CombineInstance[] combine = new CombineInstance[renderers.Length];
             List<Transform> bones = new List<Transform>();
             for (int j = 0; j < renderers.Length; j++)
@@ -36,14 +34,10 @@ public class FbxLoader : MonoBehaviour
                 bones.AddRange(renderers[j].bones);
             }
 
-            transform.GetComponent<MeshFilter>().mesh = new Mesh();
-            transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
-            Matrix4x4[] bindPoses = transform.GetComponent<MeshFilter>().mesh.bindposes;
+            Mesh combinedMesh = new Mesh();
+            combinedMesh.CombineMeshes(combine);
 
-            // bindPoses[0] = bones[0].worldToLocalMatrix * transform.localToWorldMatrix;
-            // position = new Vector3(mat[0,3], mat[1,3], mat[2,3]);
-            // quaternion = Quaternion.LookRotation(new Vector3(mat[0,2], mat[1,2], mat[2,2]), new Vector3(mat[0,1], mat[1,1], mat[2,1]));
-            // scale = new Vector3(mat.GetColumn(0).magnitude, mat.GetColumn(1).magnitude, mat.GetColumn(2).magnitude);
+            Matrix4x4[] bindPoses = combinedMesh.bindposes;
 
             /* Getting bind pose position */
             for (int j = 0; j < bindPoses.Length; j++)
@@ -52,21 +46,21 @@ public class FbxLoader : MonoBehaviour
                 bones[j].position = new Vector3(mat[0, 3], mat[1, 3], mat[2, 3]);
             }
 
+            SkinnedMeshRenderer smr = transform.GetComponent<SkinnedMeshRenderer>();
+            smr.sharedMesh = combinedMesh;
+            smr.bones = bones.ToArray();
+
             transform.gameObject.SetActive(true);
-            Debug.Log(transform.GetComponent<MeshFilter>().mesh.bindposes.Length);
 
-            Debug.Log(bones.Count);
-            ObjExporter.MeshToFile(transform.GetComponent<MeshFilter>().mesh, datapath);
+            ObjExporter.MeshToFile(combinedMesh, datapath);
             ObjExporter.BonesToFile(bones.ToArray(), datapath+"_Skeleton");
-            ObjExporter.BoneWeightsToFile(transform.GetComponent<MeshFilter>().mesh, datapath+"_Weight");
-            Destroy(instantiated);
-            
+            ObjExporter.BoneWeightsToFile(combinedMesh, datapath+"_Weight");
         }
-
     }
 
     // Update is called once per frame
     void Update()
     {
+
     }
 }
