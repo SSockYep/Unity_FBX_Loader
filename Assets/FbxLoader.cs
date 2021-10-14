@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(SkinnedMeshRenderer))]
@@ -16,7 +17,7 @@ public class FbxLoader : MonoBehaviour
             GameObject instantiated = (GameObject) Instantiate(fbxs[i]);
             meshes.Add(instantiated);
 
-            string datapath = "Results/" + instantiated.name;
+            string datapath = "Results/" + fbxs[i].name;
             SkinnedMeshRenderer[] renderers = instantiated.transform.GetComponentsInChildren<SkinnedMeshRenderer>();
             CombineInstance[] combine = new CombineInstance[renderers.Length];
             List<Transform> bones = new List<Transform>();
@@ -51,10 +52,16 @@ public class FbxLoader : MonoBehaviour
             smr.bones = bones.ToArray();
 
             transform.gameObject.SetActive(true);
-
-            ObjExporter.MeshToFile(combinedMesh, datapath);
-            ObjExporter.BonesToFile(bones.ToArray(), datapath+"_Skeleton");
-            ObjExporter.BoneWeightsToFile(combinedMesh, datapath+"_Weight");
+            try{
+                ObjExporter.MeshToFile(combinedMesh, datapath);
+                ObjExporter.BonesToFile(bones.ToArray(), datapath+"_Skeleton");
+                ObjExporter.BoneWeightsToFile(combinedMesh, datapath+"_Weight");
+                ObjExporter.VertexLocalPositionToFile(combinedMesh, bindPoses, datapath+"_LocalPos");
+            }
+            catch(Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
     }
 
